@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" href="./style.css">
+  <script defer src="./video-library.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
@@ -129,13 +130,51 @@
 
       <section class="view detail-view" id="videos" data-route="videos" aria-labelledby="video-title" hidden>
         <a class="back-link" href="#home"><span aria-hidden="true">←</span> Zurück zur Übersicht</a>
-        <div class="detail-header"><span class="detail-label">03 / ANSCHAUEN</span><h1 id="video-title" tabindex="-1">Videos</h1><p>Hier können später eigene Videos oder eingebettete Anleitungen erscheinen.</p></div>
-        <div class="video-panel">
-          <div class="video-placeholder" role="img" aria-label="Videoplatzhalter ohne Abspielfunktion">
-            <span class="video-placeholder-play" aria-hidden="true">▶</span><span class="video-placeholder-text">VIDEO-PLATZHALTER</span>
+        <div class="detail-header"><span class="detail-label">03 / ANSCHAUEN</span><h1 id="video-title" tabindex="-1">Lokale Videos</h1><p>Videos direkt vom Tablet auswählen und abspielen – ohne Upload oder Cloud.</p></div>
+        <section class="library-panel" aria-labelledby="library-heading">
+          <div class="library-heading-row">
+            <div>
+              <span class="content-overline">LOKALE MEDIATHEK</span>
+              <h2 id="library-heading">Documents / SMART</h2>
+              <p>Wähle den Ordner <strong>SMART</strong> im Verzeichnis <strong>Documents</strong> deines Tablets aus.</p>
+            </div>
+            <div class="folder-emblem" aria-hidden="true">▣</div>
           </div>
-          <div class="video-panel-copy"><span class="content-overline">DEMO · KEIN VIDEO HINTERLEGT</span><h2>Dein Video könnte hier stehen</h2><p>Im nächsten Entwicklungsschritt können wir hier beispielsweise eine lokale MP4-Datei oder ein eingebettetes Video ergänzen. Der Platzhalter spielt noch nichts ab.</p></div>
+          <p id="video-status" role="status" aria-live="polite" class="library-status">Ordnerzugriff wird geprüft …</p>
+          <div class="library-actions">
+            <button id="choose-video-folder" class="library-button primary-button" type="button">Videoordner auswählen</button>
+            <button id="grant-video-folder" class="library-button primary-button" type="button" hidden>Zugriff erneut erlauben</button>
+            <button id="refresh-video-list" class="library-button" type="button" disabled>Liste aktualisieren</button>
+            <button id="forget-video-folder" class="library-button quiet-button" type="button" disabled>Ordner vergessen</button>
+          </div>
+          <div class="fallback-section" id="video-fallback">
+            <p><strong>Alternative Dateiauswahl:</strong> Falls der Ordnerzugriff nicht unterstützt wird, wähle den Ordner oder einzelne Videos. Diese Auswahl muss nach einem Neustart eventuell wiederholt werden.</p>
+            <div class="library-actions">
+              <button id="fallback-video-folder" class="library-button" type="button">Ordner als Dateien auswählen</button>
+              <button id="fallback-video-files" class="library-button" type="button">Videodateien auswählen</button>
+            </div>
+            <input id="video-folder-input" type="file" accept="video/*,.mp4,.webm,.m4v,.mov,.ogv,.ogg,.3gp" webkitdirectory directory multiple hidden aria-label="Lokalen Videoordner auswählen">
+            <input id="video-file-input" type="file" accept="video/*,.mp4,.webm,.m4v,.mov,.ogv,.ogg,.3gp" multiple hidden aria-label="Lokale Videodateien auswählen">
+          </div>
+        </section>
+        <div class="video-library-grid">
+          <section class="video-list-panel" aria-labelledby="video-list-heading">
+            <div class="video-list-heading">
+              <h2 id="video-list-heading">Videos <span id="video-count">0</span></h2>
+              <span class="video-list-hint">Antippen zum Abspielen</span>
+            </div>
+            <ul id="video-file-list" class="video-file-list" aria-label="Verfügbare Videos">
+              <li class="video-empty">Noch keine Videos ausgewählt.</li>
+            </ul>
+          </section>
+          <section class="video-player-panel" aria-labelledby="video-player-heading">
+            <div class="video-player-heading"><span class="content-overline">VIDEOPLAYER</span><h2 id="video-player-heading">Noch kein Video gewählt</h2></div>
+            <video id="local-video-player" controls playsinline preload="metadata" aria-label="Lokales Video" hidden></video>
+            <div id="video-player-placeholder" class="video-player-empty" aria-hidden="true"><span>▶</span><p>Wähle links ein Video aus.</p></div>
+            <p id="video-player-feedback" class="player-feedback" role="status" aria-live="polite"></p>
+          </section>
         </div>
+        <p class="video-privacy-note">Die Videos werden ausschliesslich auf deinem Gerät geöffnet. Die PWA lädt keine Videodateien zu GitHub oder einem Server hoch.</p>
         <a class="secondary-home" href="#home">Zur Startseite <span aria-hidden="true">→</span></a>
       </section>
     </main>
