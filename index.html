@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7fb">
+  <meta name="description" content="Klickbares Tablet-Mock-up mit drei Beispielbereichen.">
+  <title>Mock-up Demo</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Mock-up Demo – zur Startseite">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M8 16 14 22 24 10" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-text">demo<span class="brand-dot">.</span><small>INTERAKTIVER PROTOTYP</small></span>
+      </a>
+      <span class="topbar-label"><span class="status-dot" aria-hidden="true"></span> Tablet-Ansicht</span>
+    </header>
+
+    <main id="main-content">
+      <section class="view home-view" id="home" data-route="home" aria-labelledby="home-title">
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow"><span class="sparkle" aria-hidden="true">✦</span> CLICKABLE MOCK-UP</span>
+            <h1 id="home-title" tabindex="-1">Mock-up <span>Demo</span></h1>
+            <p class="hero-lead">Entdecke einen einfachen, interaktiven Prototyp. Wähle einen Bereich und teste die Navigation mit dem Finger.</p>
+            <div class="hero-meta"><span class="meta-icon" aria-hidden="true">✓</span> Drei Ansichten <span class="meta-divider" aria-hidden="true"></span><span class="meta-icon" aria-hidden="true">✓</span> Ohne Anmeldung</div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="art-halo art-halo-one"></div><div class="art-halo art-halo-two"></div>
+            <div class="art-device">
+              <div class="art-device-top"><span></span><span></span><span></span></div>
+              <div class="art-device-head"></div>
+              <div class="art-device-line"></div>
+              <div class="art-device-cards"><i></i><i></i><i></i></div>
+            </div>
+            <div class="art-spark art-spark-one">✦</div><div class="art-spark art-spark-two">✦</div>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <div><span class="section-index">01 / ENTDECKEN</span><h2>Was möchtest du ansehen?</h2></div>
+          <p>Tippe auf eine Kachel, um sie zu öffnen.</p>
+        </div>
+
+        <div class="card-grid">
+          <a class="feature-card card-info" href="#informationen" aria-label="Informationen öffnen">
+            <div class="card-illustration info-illustration" aria-hidden="true">
+              <div class="illustration-sheet"><span></span><span></span><span></span><b></b></div>
+              <div class="illustration-bubble">i</div>
+            </div>
+            <div class="card-body">
+              <span class="card-tag">WISSEN</span><h3>Informationen</h3>
+              <p>Ein Beispieltext und ein Platzhalterbild für deine Inhalte.</p>
+              <span class="card-action">Öffnen <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+          <a class="feature-card card-exercise" href="#uebungen" aria-label="Übungen öffnen">
+            <div class="card-illustration exercise-illustration" aria-hidden="true">
+              <div class="exercise-orbit"></div>
+              <div class="exercise-body"><i class="head"></i><i class="torso"></i><i class="arm arm-left"></i><i class="arm arm-right"></i></div>
+              <div class="exercise-check">✓</div>
+            </div>
+            <div class="card-body">
+              <span class="card-tag">AKTIV WERDEN</span><h3>Übungen</h3>
+              <p>Ein einfaches Ablaufbeispiel mit nummerierten Schritten.</p>
+              <span class="card-action">Öffnen <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+          <a class="feature-card card-video" href="#videos" aria-label="Videos öffnen">
+            <div class="card-illustration video-illustration" aria-hidden="true">
+              <div class="video-window"><div class="video-sun"></div><div class="video-mountain mountain-back"></div><div class="video-mountain mountain-front"></div><span class="video-play">▶</span></div>
+              <div class="video-caption"><span></span><span></span></div>
+            </div>
+            <div class="card-body">
+              <span class="card-tag">ANSCHAUEN</span><h3>Videos</h3>
+              <p>Eine vorbereitete Fläche für spätere Video-Inhalte.</p>
+              <span class="card-action">Öffnen <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </div>
+        <div class="home-note"><span class="note-icon" aria-hidden="true">✳</span><p>Dies ist ein Demonstrator. Alle Texte, Illustrationen und Inhalte sind Beispiele.</p></div>
+      </section>
+
+      <section class="view detail-view" id="informationen" data-route="informationen" aria-labelledby="info-title" hidden>
+        <a class="back-link" href="#home"><span aria-hidden="true">←</span> Zurück zur Übersicht</a>
+        <div class="detail-header"><span class="detail-label">01 / WISSEN</span><h1 id="info-title" tabindex="-1">Informationen</h1><p>So könnte eine Informationsseite mit Bild und kurzen Erläuterungen aussehen.</p></div>
+        <div class="detail-grid">
+          <article class="content-panel"><span class="content-overline">BEISPIELINHALT</span><h2>Alles Wichtige auf einen Blick</h2><p>Diese Seite zeigt, wie sich kurze, verständliche Informationen für eine Tablet-Anwendung darstellen lassen.</p><p>Hier könnten später eigene Texte, Hinweise, Dokumente oder Antworten auf häufige Fragen stehen.</p><div class="info-callout"><span class="info-callout-symbol" aria-hidden="true">✦</span><p><strong>Gut zu wissen:</strong> Die Inhalte sind Platzhalter und können später jederzeit angepasst werden.</p></div></article>
+          <figure class="picture-panel">
+            <svg role="img" aria-label="Illustratives Platzhalterbild mit Sonne, Bergen und Pflanzen" viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg">
+              <rect width="520" height="380" fill="#e5edf9"/>
+              <circle cx="382" cy="93" r="51" fill="#ffdfaa"/>
+              <path d="M0 274 137 123 251 244 334 174 520 322V380H0Z" fill="#bacde3"/>
+              <path d="M0 329 169 198 282 314 392 218 520 326V380H0Z" fill="#87a3b7"/>
+              <path d="M0 339Q140 286 246 337T520 312V380H0Z" fill="#6b958c"/>
+              <path d="M56 380q-35-72 3-116m-3 116q42-64 79-70m-79 70q-57-38-65-82" stroke="#467e75" stroke-width="9" stroke-linecap="round" fill="none"/>
+              <path d="M462 380q-28-52 6-90m-6 90q-35-30-44-64m44 64q44-52 64-56" stroke="#467e75" stroke-width="9" stroke-linecap="round" fill="none"/>
+            </svg>
+            <figcaption>Illustratives Platzhalterbild – später durch eigenes Bild ersetzen</figcaption>
+          </figure>
+        </div>
+        <a class="secondary-home" href="#home">Zur Startseite <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="view detail-view" id="uebungen" data-route="uebungen" aria-labelledby="exercise-title" hidden>
+        <a class="back-link" href="#home"><span aria-hidden="true">←</span> Zurück zur Übersicht</a>
+        <div class="detail-header"><span class="detail-label">02 / AKTIV WERDEN</span><h1 id="exercise-title" tabindex="-1">Übungen</h1><p>Ein Beispiel dafür, wie schrittweise Anleitungen im Mock-up aussehen können.</p></div>
+        <div class="steps-panel">
+          <div class="steps-panel-header"><span class="content-overline">DEMO-ABLAUF</span><span class="steps-count">3 Schritte</span></div>
+          <ol class="steps-list">
+            <li><span class="step-number">01</span><div><h2>Vorbereitung</h2><p>Lege alles bereit und öffne die Anleitung auf dem Tablet.</p></div><span class="step-time">1 Min.</span></li>
+            <li><span class="step-number">02</span><div><h2>Anleitung durchgehen</h2><p>Lies den kurzen Beispieltext und prüfe, ob die Darstellung gut verständlich ist.</p></div><span class="step-time">2 Min.</span></li>
+            <li><span class="step-number">03</span><div><h2>Zur Übersicht wechseln</h2><p>Benutze den Zurück-Button, um eine andere Ansicht zu öffnen.</p></div><span class="step-time">1 Min.</span></li>
+          </ol>
+          <p class="disclaimer"><span aria-hidden="true">ⓘ</span> Dies ist eine Navigationstest-Anleitung, keine medizinische oder körperliche Übung.</p>
+        </div>
+        <a class="secondary-home" href="#home">Zur Startseite <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="view detail-view" id="videos" data-route="videos" aria-labelledby="video-title" hidden>
+        <a class="back-link" href="#home"><span aria-hidden="true">←</span> Zurück zur Übersicht</a>
+        <div class="detail-header"><span class="detail-label">03 / ANSCHAUEN</span><h1 id="video-title" tabindex="-1">Videos</h1><p>Hier können später eigene Videos oder eingebettete Anleitungen erscheinen.</p></div>
+        <div class="video-panel">
+          <div class="video-placeholder" role="img" aria-label="Videoplatzhalter ohne Abspielfunktion">
+            <span class="video-placeholder-play" aria-hidden="true">▶</span><span class="video-placeholder-text">VIDEO-PLATZHALTER</span>
+          </div>
+          <div class="video-panel-copy"><span class="content-overline">DEMO · KEIN VIDEO HINTERLEGT</span><h2>Dein Video könnte hier stehen</h2><p>Im nächsten Entwicklungsschritt können wir hier beispielsweise eine lokale MP4-Datei oder ein eingebettetes Video ergänzen. Der Platzhalter spielt noch nichts ab.</p></div>
+        </div>
+        <a class="secondary-home" href="#home">Zur Startseite <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+    <footer class="footer"><span>© Mock-up Demo</span><span>Nur zu Testzwecken · Keine Datenspeicherung</span></footer>
+  </div>
+</body>
+</html>
