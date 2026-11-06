@@ -11,6 +11,7 @@ function fakeElement(id) {
   return {
     id, hidden: false, disabled: false, textContent: "", value: "",
     dataset: {}, children: [], className: "", attributes: {},
+    classList: { toggle(name, active) { this.last = { name, active }; } },
     addEventListener(name, cb) { listeners.set(name, cb); },
     dispatch(name, arg) { return listeners.get(name)?.(arg); },
     setAttribute(key, value) { this.attributes[key] = value; },
