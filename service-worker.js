@@ -1,12 +1,13 @@
 "use strict";
 
 // Increment this cache name when changing the offline asset list or release.
-const CACHE_NAME = "mockup-demo-v1";
+const CACHE_NAME = "mockup-demo-v2";
 const APP_ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
+  "./video-library.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

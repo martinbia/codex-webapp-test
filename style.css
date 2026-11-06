@@ -96,3 +96,48 @@ h1,h2,h3,p{margin-top:0}
 @media(max-width:680px){.app-shell{padding:0 18px}.topbar{min-height:83px}.topbar-label{font-size:10px;padding:10px}.brand-mark{width:39px;height:39px}.brand-text{font-size:20px}.brand-text small{font-size:7px}.brand-dot{left:50px}.hero{margin-top:22px;min-height:auto;padding:35px 27px;border-radius:22px}.hero h1{font-size:45px}.hero-lead{font-size:14px}.hero-art{display:none}.section-heading{display:block;margin:34px 0 21px}.section-heading h2{font-size:28px}.section-heading p{margin:12px 0 0}.card-grid{grid-template-columns:1fr;gap:17px}.feature-card{display:grid;grid-template-columns:135px 1fr;min-height:180px}.card-illustration{height:100%;min-height:192px}.illustration-sheet,.video-window,.exercise-orbit{transform:scale(.7)}.illustration-sheet{transform:rotate(-9deg) scale(.7)}.illustration-bubble,.exercise-check{right:14px}.exercise-body{transform:scale(.75)}.video-caption{display:none}.card-body{padding:21px 17px}.card-body h3{font-size:21px;margin:7px 0}.card-body p{font-size:12px;min-height:0}.card-action{margin-top:13px;padding-top:10px}.home-note{margin:26px 0}.detail-header h1{font-size:40px}.steps-list li{gap:14px}.step-number{width:45px;height:45px}.step-time{display:none}.footer{flex-wrap:wrap;padding:20px 0;min-height:70px}}
 @media(max-width:420px){.feature-card{grid-template-columns:108px 1fr}.card-illustration{min-height:205px}.card-body{padding:17px 13px}.card-body h3{font-size:19px}.card-tag{font-size:9px}.card-action{margin-top:13px}.illustration-sheet,.video-window,.exercise-orbit{transform:scale(.58)}.illustration-sheet{transform:rotate(-9deg) scale(.58)}.exercise-body{transform:scale(.6)}.hero h1{font-size:40px}.hero{padding:30px 23px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.view{animation:none}.feature-card{transition:none}}
+
+/* Local SMART video library – added without changing existing card styles */
+.library-panel,.video-list-panel,.video-player-panel{background:#fff;border:1px solid var(--stroke);border-radius:23px;box-shadow:var(--shadow)}
+.library-panel{padding:clamp(22px,4vw,36px);margin-bottom:22px}
+.library-heading-row{display:flex;align-items:flex-start;justify-content:space-between;gap:22px}
+.library-heading-row h2{font:750 clamp(21px,3vw,27px)/1.2 Outfit,system-ui,sans-serif;margin:12px 0}
+.library-heading-row p{color:var(--muted);font-size:14px;line-height:1.65;margin-bottom:10px}
+.folder-emblem{font-size:40px;color:#4e66cb;background:#edf1ff;padding:15px;border-radius:18px;line-height:1}
+.library-status{padding:15px 18px;background:#eff5ff;border-radius:12px;color:#344e89;font-size:14px;line-height:1.6}
+.library-status[data-kind="warning"]{background:#fff6e9;color:#80591a}
+.library-status[data-kind="error"]{background:#ffedef;color:#963645}
+.library-actions{display:flex;flex-wrap:wrap;gap:10px;margin:17px 0 0}
+.library-button{border:1px solid #dce3f3;background:white;color:#334d9d;border-radius:11px;min-height:48px;padding:12px 17px;font:700 14px 'DM Sans',sans-serif;cursor:pointer}
+.library-button.primary-button{background:#4661d1;border-color:#4661d1;color:white}
+.library-button.quiet-button{color:#65718a}
+.library-button:disabled{opacity:.5;cursor:not-allowed}
+.library-button:not(:disabled):hover{background:#eaf0ff}
+.library-button.primary-button:not(:disabled):hover{background:#354fbd}
+.fallback-section{margin-top:26px;border-top:1px solid var(--stroke);padding-top:18px}
+.fallback-section p{font-size:13px;line-height:1.7;color:#69758b;max-width:780px;margin:0}
+.video-library-grid{display:grid;grid-template-columns:minmax(260px,.9fr) minmax(0,1.3fr);gap:21px;align-items:start}
+.video-list-panel{padding:22px;min-width:0}
+.video-list-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--stroke);padding-bottom:15px}
+.video-list-heading h2{font:700 22px Outfit,system-ui,sans-serif;margin:0}
+.video-list-heading h2 span{font:700 13px 'DM Sans',sans-serif;color:#596aca;background:#eef0ff;border-radius:30px;padding:5px 9px;vertical-align:middle}
+.video-list-hint{font-size:11px;color:#8290a4}
+.video-file-list{list-style:none;margin:12px 0 0;padding:0;max-height:420px;overflow:auto}
+.video-empty{color:#7e8a9c;font-size:14px;padding:28px 10px;line-height:1.6}
+.video-file-list li{margin-bottom:7px}
+.video-list-button{border:1px solid transparent;background:#f7f9fc;border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:12px;width:100%;min-height:57px;text-align:left;cursor:pointer;font:600 14px 'DM Sans',sans-serif;color:#32445f}
+.video-list-button.selected{background:#edf0ff;border-color:#b7c4fb;color:#344fc1}
+.video-list-button:not(.selected):hover{background:#eff4fc}
+.video-entry-icon{display:grid;place-items:center;width:35px;height:35px;background:#e5eaff;color:#4b61c6;flex-shrink:0;border-radius:10px;font-size:12px}
+.video-entry-name{min-width:0;flex:1;overflow-wrap:anywhere}
+.video-player-panel{padding:24px;min-width:0}
+.video-player-heading h2{font:700 clamp(19px,2.5vw,25px) Outfit,system-ui,sans-serif;overflow-wrap:anywhere;margin:12px 0 22px}
+#local-video-player{display:block;width:100%;max-height:min(56vh,490px);border-radius:13px;background:#10182c}
+.video-player-empty{min-height:240px;background:linear-gradient(135deg,#d4def5,#d3cbed);border-radius:13px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#5264a6}
+.video-player-empty span{font-size:37px;width:74px;height:74px;display:grid;place-items:center;border-radius:50%;background:#fff;padding-left:5px}
+.video-player-empty p{font-weight:700;font-size:14px}
+.player-feedback{color:#66758a;font-size:13px;line-height:1.6;margin:14px 0 0}
+.player-feedback:empty{display:none}
+.video-privacy-note{font-size:13px;line-height:1.6;color:#778396;margin:20px 0}
+@media(max-width:780px){.video-library-grid{grid-template-columns:1fr}.video-file-list{max-height:330px}}
+@media(max-width:480px){.library-panel,.video-list-panel,.video-player-panel{padding:18px}.folder-emblem{display:none}.library-button{flex-grow:1}.video-list-heading{flex-wrap:wrap}}
