@@ -17,6 +17,7 @@ function showRoute() {
     view.hidden = view.dataset.route !== route;
   });
   activeRoute = route;
+  document.dispatchEvent(new CustomEvent("mockup:routechange", { detail: { route } }));
 
   const activeView = views.find((view) => view.dataset.route === route);
   const heading = activeView?.querySelector("h1");
