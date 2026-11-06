@@ -33,3 +33,10 @@ function showRoute() {
 
 window.addEventListener("hashchange", showRoute);
 showRoute();
+
+if ("serviceWorker" in navigator && window.location.protocol === "https:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .catch((error) => console.warn("Offline-Modus nicht verfügbar:", error));
+  });
+}
