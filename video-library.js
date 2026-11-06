@@ -22,6 +22,12 @@
   let entries = [];
   let activeObjectURL = null;
   let activeIndex = -1;
+  let playRequestId = 0;
+  let thumbnailGeneration = 0;
+  let thumbnailObserver = null;
+  let thumbnailQueue = [];
+  let thumbnailWorking = false;
+  let visibleButtons = [];
   let runNumber = 0;
   let fallbackMode = false;
   let databaseSupported = "indexedDB" in window;
@@ -109,7 +115,12 @@
   }
 
   function resetVideo() {
+    // Invalidate pending getFile()/play() promises, so navigation cannot restart audio.
+    ++playRequestId;
     el.player.pause();
+    if (document.fullscreenElement === el.player && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
     el.player.removeAttribute("src");
     el.player.load();
     if (activeObjectURL) URL.revokeObjectURL(activeObjectURL);
@@ -121,7 +132,120 @@
     el.feedback.textContent = "";
   }
 
+  function updateSelection() {
+    visibleButtons.forEach((button, index) => {
+      button.classList.toggle("selected", index === activeIndex);
+      button.setAttribute("aria-current", index === activeIndex ? "true" : "false");
+    });
+  }
+
+  function setThumbnail(entry, data) {
+    if (!data || !entry.thumbnailSlot) return;
+    const image = document.createElement("img");
+    image.className = "video-entry-thumbnail-img";
+    image.src = data;
+    image.alt = "";
+    image.loading = "lazy";
+    entry.thumbnailSlot.replaceChildren(image);
+  }
+
+  async function captureThumbnail(file) {
+    // A transient, muted video element generates one small snapshot.
+    // It never plays and its temporary object URL is always released.
+    const url = URL.createObjectURL(file);
+    const probe = document.createElement("video");
+    probe.muted = true;
+    probe.playsInline = true;
+    probe.preload = "auto";
+    let timeout;
+    try {
+      return await new Promise((resolve) => {
+        let done = false;
+        const finish = (data) => {
+          if (done) return;
+          done = true;
+          clearTimeout(timeout);
+          resolve(data);
+        };
+        const capture = () => {
+          if (!probe.videoWidth || !probe.videoHeight) return;
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = 160;
+            canvas.height = 90;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return finish(null);
+            ctx.fillStyle = "#17233b";
+            ctx.fillRect(0, 0, 160, 90);
+            const scale = Math.min(160 / probe.videoWidth, 90 / probe.videoHeight);
+            const w = probe.videoWidth * scale, h = probe.videoHeight * scale;
+            ctx.drawImage(probe, (160 - w) / 2, (90 - h) / 2, w, h);
+            finish(canvas.toDataURL("image/jpeg", 0.68));
+          } catch {
+            finish(null);
+          }
+        };
+        probe.addEventListener("loadedmetadata", () => {
+          const duration = probe.duration;
+          if (Number.isFinite(duration) && duration > 0.15) {
+            // A frame slightly after the start is usually more informative.
+            try { probe.currentTime = Math.min(1, duration / 4); }
+            catch { /* loadeddata may still supply a frame */ }
+          } else if (probe.readyState >= 2) capture();
+        });
+        probe.addEventListener("loadeddata", capture);
+        probe.addEventListener("seeked", capture);
+        probe.addEventListener("error", () => finish(null));
+        timeout = setTimeout(() => finish(null), 6500);
+        probe.src = url;
+        probe.load();
+      });
+    } finally {
+      probe.pause();
+      probe.removeAttribute("src");
+      probe.load();
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  function queueThumbnail(index, generation) {
+    const entry = entries[index];
+    if (!entry || entry.thumbnailQueued || entry.thumbnailData || entry.thumbnailFailed) return;
+    entry.thumbnailQueued = true;
+    thumbnailQueue.push({ entry, index, generation });
+    processThumbnailQueue();
+  }
+
+  function processThumbnailQueue() {
+    if (thumbnailWorking) return;
+    thumbnailWorking = true;
+    (async () => {
+      while (thumbnailQueue.length) {
+        const { entry, index, generation } = thumbnailQueue.shift();
+        if (generation !== thumbnailGeneration || entries[index] !== entry) continue;
+        let data = null;
+        try { data = await captureThumbnail(await entry.getFile()); }
+        catch { /* Missing/undecodable videos retain a generic icon. */ }
+        if (generation !== thumbnailGeneration || entries[index] !== entry) continue;
+        entry.thumbnailQueued = false;
+        if (data) {
+          entry.thumbnailData = data;
+          setThumbnail(entry, data);
+        } else entry.thumbnailFailed = true;
+      }
+    })().finally(() => {
+      thumbnailWorking = false;
+      if (thumbnailQueue.length) processThumbnailQueue();
+    });
+  }
+
   function renderList() {
+    ++thumbnailGeneration;
+    const generation = thumbnailGeneration;
+    thumbnailQueue = [];
+    thumbnailObserver?.disconnect();
+    thumbnailObserver = null;
+    visibleButtons = [];
     el.count.textContent = String(entries.length);
     el.list.replaceChildren();
     if (!entries.length) {
@@ -131,31 +255,51 @@
       el.list.append(li);
       return;
     }
+
+    if ("IntersectionObserver" in window) {
+      thumbnailObserver = new window.IntersectionObserver((items) => {
+        items.forEach(({ target, isIntersecting }) => {
+          if (!isIntersecting) return;
+          thumbnailObserver.unobserve(target);
+          const index = Number(target.dataset.videoIndex);
+          queueThumbnail(index, generation);
+        });
+      }, { root: el.list, rootMargin: "180px" });
+    }
+
     entries.forEach((entry, index) => {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "video-list-button" + (index === activeIndex ? " selected" : "");
+      btn.className = "video-list-button";
+      btn.dataset.videoIndex = String(index);
       btn.setAttribute("aria-label", entry.name + " abspielen");
-      btn.setAttribute("aria-current", index === activeIndex ? "true" : "false");
-      const symbol = document.createElement("span");
-      symbol.className = "video-entry-icon";
-      symbol.textContent = "▶";
-      symbol.setAttribute("aria-hidden", "true");
+      const thumb = document.createElement("span");
+      thumb.className = "video-entry-thumbnail";
+      thumb.textContent = "▶";
+      thumb.setAttribute("aria-hidden", "true");
+      entry.thumbnailSlot = thumb;
+      if (entry.thumbnailData) setThumbnail(entry, entry.thumbnailData);
       const name = document.createElement("span");
       name.className = "video-entry-name";
       name.textContent = entry.name;
       const chevron = document.createElement("span");
       chevron.setAttribute("aria-hidden", "true");
       chevron.textContent = "›";
-      btn.append(symbol, name, chevron);
+      btn.append(thumb, name, chevron);
       btn.addEventListener("click", () => playEntry(index));
       li.append(btn);
       el.list.append(li);
+      visibleButtons.push(btn);
+      if (thumbnailObserver) thumbnailObserver.observe(btn);
+      // IntersectionObserver is standard on recent Android Chrome;
+      // limited eager thumbnails keep legacy devices usable.
+      else if (index < 12) queueThumbnail(index, generation);
     });
+    updateSelection();
   }
 
-  function videoFile(file) {
+    function videoFile(file) {
     return file && (allowedExt.test(file.name) || supportedTypes.has(file.type));
   }
 
@@ -283,36 +427,45 @@
     const entry = entries[index];
     if (!entry) return;
     resetVideo();
+    const thisPlay = ++playRequestId;
     activeIndex = index;
-    renderList();
+    updateSelection();
     el.heading.textContent = entry.name;
     el.feedback.textContent = "Video wird geladen …";
     try {
       const file = await entry.getFile();
-      if (activeIndex !== index) return;
+      if (thisPlay !== playRequestId || window.location.hash !== "#videos") return;
       const url = URL.createObjectURL(file);
       activeObjectURL = url;
       el.player.src = url;
       el.player.hidden = false;
       el.placeholder.hidden = true;
       el.player.load();
+      if (window.matchMedia && window.matchMedia("(max-width: 1100px)").matches) {
+        el.heading.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
       try {
         await el.player.play();
+        // Chrome can settle play() after the user has navigated away.
+        if (thisPlay !== playRequestId || window.location.hash !== "#videos") {
+          el.player.pause();
+          return;
+        }
         el.feedback.textContent = "";
       } catch (err) {
-        // Browser can require a second play tap or reject an unsupported codec.
+        if (thisPlay !== playRequestId) return;
         if (err.name === "NotAllowedError") el.feedback.textContent = "Bitte am Videoplayer auf Play tippen.";
         else if (err.name !== "AbortError") el.feedback.textContent = "Automatische Wiedergabe nicht möglich. Bitte Play tippen oder Format prüfen.";
       }
     } catch (err) {
-      el.feedback.textContent = errorMessage(err);
+      if (thisPlay === playRequestId) el.feedback.textContent = errorMessage(err);
     }
   }
 
-  function onVideoViewChange(route) {
+    function onVideoViewChange(route) {
     if (route !== "videos") {
       resetVideo();
-      renderList();
+      updateSelection();
     } else if (directory && !fallbackMode) {
       // Check only; never request permissions automatically on navigation.
       loadDirectory();
@@ -333,6 +486,17 @@
     });
     document.addEventListener("mockup:routechange", (event) => onVideoViewChange(event.detail.route));
     window.addEventListener("pagehide", resetVideo);
+    // Handle navigation immediately, before asynchronous hash-route rendering.
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest?.('a[href^="#"]');
+      if (link && link.getAttribute("href") !== "#videos") resetVideo();
+    }, true);
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash !== "#videos") resetVideo();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) resetVideo();
+    });
     if (!hasFolderPicker) {
       el.choose.disabled = true;
       status("Direkter Ordnerzugriff ist auf diesem Gerät nicht verfügbar. Verwende die alternative Dateiauswahl.", "warning");
