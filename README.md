@@ -87,3 +87,19 @@ All content is fictitious. Do not use this public repository to store private pr
 - [ ] Try alternative folder/file selection on unsupported browsers.
 - [ ] Use Ordner vergessen: confirm local video files remain untouched.
 - [ ] Switch offline after first online launch and successful local access.
+
+## Tablet video-player improvements (v3)
+
+- The player uses its available panel width, preserves the video aspect ratio, and caps height relative to the device viewport. On narrower tablets (including portrait orientation) the player appears above the list.
+- Selecting a video scrolls to the player on narrow layouts.
+- Navigating away from **Videos** stops the current video and releases its temporary blob URL; delayed async file reads are invalidated to prevent audio from restarting after navigation.
+- Local video thumbnails are generated from a frame using a temporary muted HTML5 video element and a canvas. The thumbnail (and filename) form one large touch target. Only currently visible entries are processed on modern browsers; unsuccessful extractions retain a simple play icon.
+- Thumbnails are generated locally and are not uploaded, stored in IndexedDB, or added to the PWA offline cache. Some videos (unsupported codecs, protected media) cannot be previewed.
+
+### Tablet checks after deployment
+
+- [ ] Portrait: player fits the screen width with no horizontal scrolling; video controls remain visible.
+- [ ] Landscape: player remains within the viewport width and height limits.
+- [ ] Start playback and press Back to home: playback stops immediately and never resumes on its own.
+- [ ] Try browser Back and switching between sections while a video loads.
+- [ ] Verify local thumbnails appear for supported videos, and filenames/thumbnails can both be tapped.
