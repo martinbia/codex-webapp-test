@@ -34,15 +34,25 @@ function createHarness({ showDirectoryPicker, indexedDB } = {}) {
   let nextURL = 0;
   const created = [];
   const revoked = [];
+  const observed = [];
+  class FakeIntersectionObserver {
+    constructor(callback) { this.callback = callback; }
+    observe(target) { observed.push({ target, callback: this.callback }); }
+    disconnect() {}
+    unobserve() {}
+  }
   const sandbox = {
     window: {
       showDirectoryPicker,
+      location: { hash: "#videos" },
+      IntersectionObserver: FakeIntersectionObserver,
       addEventListener(name, cb) { listeners.set("window:" + name, cb); }
     },
     indexedDB,
     document: {
       getElementById: get,
       createElement: fakeElement,
+      hidden: false,
       addEventListener(name, cb) { listeners.set(name, cb); }
     },
     URL: {
@@ -63,7 +73,7 @@ function createHarness({ showDirectoryPicker, indexedDB } = {}) {
     sandbox,
     { filename: "video-library.js" }
   );
-  return { get, listeners, created, revoked, sandbox };
+  return { get, listeners, created, revoked, observed, sandbox };
 }
 
 function tick() {
@@ -97,6 +107,7 @@ test("fallback file picker filters and sorts local video filenames", async () =>
   h.listeners.get("mockup:routechange")({ detail: { route: "informationen" } });
   assert.deepEqual(h.revoked, [h.created[0].url]);
   assert.equal(h.get("local-video-player").paused, true);
+  assert.equal(h.get("local-video-player").attributes.src, undefined);
 });
 
 test("choosing a folder shows read-only files and forgets without deleting them", async () => {
@@ -131,4 +142,58 @@ test("unsupported picker provides alternative controls and no server upload", as
   assert.equal(h.get("choose-video-folder").disabled, true);
   h.get("fallback-video-files").dispatch("click");
   assert.equal(h.get("video-file-input").clicked, true);
+});
+
+test("thumbnail list reserves an image slot and responsive item labels", async () => {
+  const h = createHarness();
+  await tick();
+  h.get("video-file-input").dispatch("change", {
+    target: { files: [{ name: "Langes Beispielvideo.mp4", type: "video/mp4" }] }
+  });
+  const button = h.get("video-file-list").children[0].children[0];
+  assert.equal(button.children[0].className, "video-entry-thumbnail");
+  assert.equal(button.children[1].textContent, "Langes Beispielvideo.mp4");
+  assert.equal(h.observed.length, 1);
+});
+
+test("hash-navigation stops active playback synchronously", async () => {
+  const h = createHarness();
+  await tick();
+  h.get("video-file-input").dispatch("change", {
+    target: { files: [{ name: "Clip.mp4", type: "video/mp4" }] }
+  });
+  h.get("video-file-list").children[0].children[0].dispatch("click");
+  await tick();
+  h.sandbox.window.location.hash = "#home";
+  h.listeners.get("window:hashchange")();
+  assert.equal(h.get("local-video-player").paused, true);
+  assert.equal(h.get("local-video-player").attributes.src, undefined);
+  assert.equal(h.revoked.length, 1);
+});
+
+test("pending video file request cannot resume playback after navigation", async () => {
+  const h = createHarness();
+  await tick();
+  let resolveFile;
+  const pendingFile = new Promise((resolve) => { resolveFile = resolve; });
+  const handle = {
+    name: "SMART",
+    async queryPermission() { return "granted"; },
+    async *entries() {
+      yield ["Later.mp4", { kind: "file", async getFile() { return pendingFile; } }];
+    }
+  };
+  h.sandbox.window.showDirectoryPicker = async () => handle;
+  // The picker availability is snapshotted on initialization: use a fresh harness.
+  const k = createHarness({ showDirectoryPicker: async () => handle });
+  await tick();
+  await k.get("choose-video-folder").dispatch("click");
+  await tick();
+  k.get("video-file-list").children[0].children[0].dispatch("click");
+  k.sandbox.window.location.hash = "#informationen";
+  k.listeners.get("window:hashchange")();
+  resolveFile({ name: "Later.mp4", type: "video/mp4" });
+  await tick();
+  assert.equal(k.created.length, 0);
+  assert.equal(k.get("local-video-player").played, undefined);
 });
